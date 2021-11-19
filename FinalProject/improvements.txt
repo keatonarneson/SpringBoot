@@ -1,0 +1,3 @@
+UUID for user instead of auto incrementing
+
+Default timestamp from the sql database or from client, ie Date.now() ?

@@ -22,7 +22,7 @@ CREATE TABLE users (
   cover_photo_url VARCHAR(255),
   followers_count INT DEFAULT 0,
   following_count INT DEFAULT 0,
-  registered_on DATETIME NOT NULL ,
+  registered_on DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id)
 );
 

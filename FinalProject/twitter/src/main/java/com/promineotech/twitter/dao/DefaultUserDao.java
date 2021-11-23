@@ -19,10 +19,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Component
-@Slf4j
 public class DefaultUserDao implements UserDao {
 
   @Autowired
@@ -30,8 +27,6 @@ public class DefaultUserDao implements UserDao {
 
   @Override
   public List<User> getAllUsers() {
-    log.info("user list requested (user dao)");
-
     String sql = "SELECT * FROM users";
 
     return jdbcTemplate.query(sql, new UserMapper());
@@ -50,7 +45,7 @@ public class DefaultUserDao implements UserDao {
 
   @Override
   public User saveUser(User user) {
-    String sql = "INSERT INTO users (username, email, password, name, bio, location, website, birthdate, avatar_url, cover_photo_url, followers_count, following_count, registered_on) VALUES (:username, :email, :password, :name, :bio, :location, :website, :birthdate, :avatar_url, :cover_photo_url, :followers_count, :following_count, :registered_on)";
+    String sql = "INSERT INTO users (username, email, password, name, bio, location, website, birthdate, avatar_url, cover_photo_url, followers_count, following_count) VALUES (:username, :email, :password, :name, :bio, :location, :website, :birthdate, :avatar_url, :cover_photo_url, :followers_count, :following_count)";
 
     SqlParams params = new SqlParams();
 
@@ -67,10 +62,8 @@ public class DefaultUserDao implements UserDao {
     params.source.addValue("cover_photo_url", user.getCoverPhotoURL());
     params.source.addValue("followers_count", user.getFollowersCount());
     params.source.addValue("following_count", user.getFollowingCount());
-    params.source.addValue("registered_on", user.getRegisteredOn());
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
-    // if (jdbctemplate.update = 0) throw exception
     jdbcTemplate.update(params.sql, params.source, keyHolder);
 
     Long userId = keyHolder.getKey().longValue();
@@ -79,13 +72,47 @@ public class DefaultUserDao implements UserDao {
         .password(user.getPassword()).name(user.getName()).bio(user.getBio()).location(user.getLocation())
         .website(user.getWebsite()).birthdate(user.getBirthdate()).avatarURL(user.getAvatarURL())
         .coverPhotoURL(user.getCoverPhotoURL()).followersCount(user.getFollowersCount())
-        .followingCount(user.getFollowingCount()).registeredOn(user.getRegisteredOn()).build();
+        .followingCount(user.getFollowingCount()).build();
   }
 
   @Override
-  public User updateUser(User user) {
-    // TODO Auto-generated method stub
-    return null;
+  public User updateUser(User user, Long userId) {
+    String sql = "UPDATE users SET username=:username, email=:email, password=:password, name=:name, bio=:bio, location=:location, website=:website, birthdate=:birthdate, avatar_url=:avatar_url, cover_photo_url=:cover_photo_url, followers_count=:followers_count, following_count=:following_count WHERE user_id = :user_id";
+
+    SqlParams params = new SqlParams();
+
+    params.sql = sql;
+    params.source.addValue("username", user.getUsername());
+    params.source.addValue("email", user.getEmail());
+    params.source.addValue("password", user.getPassword());
+    params.source.addValue("name", user.getName());
+    params.source.addValue("bio", user.getBio());
+    params.source.addValue("location", user.getLocation());
+    params.source.addValue("website", user.getWebsite());
+    params.source.addValue("birthdate", user.getBirthdate());
+    params.source.addValue("avatar_url", user.getAvatarURL());
+    params.source.addValue("cover_photo_url", user.getCoverPhotoURL());
+    params.source.addValue("followers_count", user.getFollowersCount());
+    params.source.addValue("following_count", user.getFollowingCount());
+    params.source.addValue("user_id", userId);
+
+    jdbcTemplate.update(params.sql, params.source);
+
+    return User.builder().userId(user.getUserId()).username(user.getUsername()).email(user.getEmail())
+        .password(user.getPassword()).name(user.getName()).bio(user.getBio()).location(user.getLocation())
+        .website(user.getWebsite()).birthdate(user.getBirthdate()).avatarURL(user.getAvatarURL())
+        .coverPhotoURL(user.getCoverPhotoURL()).followersCount(user.getFollowersCount())
+        .followingCount(user.getFollowingCount()).build();
+  }
+
+  @Override
+  public void deleteUser(Long userId) {
+    String sql = "DELETE FROM users WHERE user_id=:user_id";
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("user_id", userId);
+
+    jdbcTemplate.update(sql, params);
   }
 
 }
@@ -100,29 +127,27 @@ class UserMapper implements RowMapper<User> {
         .password(rs.getString("password")).name(rs.getString("name")).bio(rs.getString("bio"))
         .location(rs.getString("location")).birthdate(rs.getDate("birthdate")).avatarURL(rs.getString("avatar_url"))
         .coverPhotoURL(rs.getString("cover_photo_url")).followersCount(rs.getInt("followers_count"))
-        .followingCount(rs.getInt("followers_count")).build();
+        .followingCount(rs.getInt("followers_count")).registeredOn(rs.getDate("registered_on")).build();
   }
-
-
 
 }
 
 class UserResultSetExtractor implements ResultSetExtractor<User> {
   @Override
   public User extractData(ResultSet rs) throws SQLException {
-    // rs.next();
 
     if (!rs.next()) {
       throw new NoSuchElementException();
     }
+    
 
-    return User.builder().userId(rs.getLong("user_id")).username(rs.getString("username")).email(rs.getString("email"))
-        .password(rs.getString("password")).name(rs.getString("name")).bio(rs.getString("bio"))
-        .location(rs.getString("location")).birthdate(rs.getDate("birthdate")).avatarURL(rs.getString("avatar_url"))
-        .coverPhotoURL(rs.getString("cover_photo_url")).followersCount(rs.getInt("followers_count"))
-        .followingCount(rs.getInt("followers_count")).build();
+      return User.builder().userId(rs.getLong("user_id")).username(rs.getString("username")).email(rs.getString("email"))
+          .password(rs.getString("password")).name(rs.getString("name")).bio(rs.getString("bio"))
+          .location(rs.getString("location")).birthdate(rs.getDate("birthdate")).avatarURL(rs.getString("avatar_url"))
+          .coverPhotoURL(rs.getString("cover_photo_url")).followersCount(rs.getInt("followers_count"))
+          .followingCount(rs.getInt("followers_count")).registeredOn(rs.getDate("registered_on")).build();
+    
   }
-
 }
 
 class SqlParams {

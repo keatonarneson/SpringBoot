@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
 public class DefaultUserService implements UserService {
 
   @Autowired
@@ -22,8 +19,6 @@ public class DefaultUserService implements UserService {
   @Transactional(readOnly = true)
   @Override
   public List<User> getAllUsers() {
-    log.info("user list requested (user service)");
-
     List<User> users = userDao.getAllUsers();
 
     return users;
@@ -32,13 +27,9 @@ public class DefaultUserService implements UserService {
   @Transactional(readOnly = true)
   @Override
   public User getUserById(Long userId) {
+    checkIfUserExists(userId);
+    
     User fetchedUser = userDao.getUserById(userId);
-
-    if (fetchedUser == null) {
-      String msg = String.format("No User with User ID = %d", userId);
-
-      throw new NoSuchElementException(msg);
-    }
 
     return fetchedUser;
   }
@@ -51,10 +42,35 @@ public class DefaultUserService implements UserService {
 
   @Transactional
   @Override
-  public User updateUser(User user) {
-    return null;
+  public User updateUser(User user, Long userId) {
+    checkIfUserExists(userId);
+
+    return userDao.updateUser(user, userId);
   }
 
-  // delete use @transactional
-  
+  @Transactional
+  @Override
+  public void deleteUser(Long userId) {
+    checkIfUserExists(userId);
+
+    userDao.deleteUser(userId);
+  }
+
+
+  // ----helper methods below---------------------------------------------------------------
+  void checkIfUserExists(Long userId) {
+    User fetchedUser = userDao.getUserById(userId);
+
+    if (fetchedUser == null) {
+      String msg = String.format("No User with User ID = %d", userId);
+
+      throw new NoSuchElementException(msg);
+    }
+  }
+
+
 }
+
+
+
+

@@ -30,7 +30,7 @@ CREATE TABLE posts(
   post_id INT NOT NULL AUTO_INCREMENT,
   content VARCHAR(280) DEFAULT '',
   posted_by INT NOT NULL,
-  posted_on DATETIME NOT NULL,
+  posted_on DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   like_count INTEGER DEFAULT 0,
   reply_count INTEGER DEFAULT 0,
   parent_id INTEGER,
@@ -43,7 +43,7 @@ CREATE TABLE likes(
   like_id INT NOT NULL AUTO_INCREMENT,
   post_id INT NOT NULL,
   user_id INT NOT NULL,
-  liked_on DATETIME NOT NULL,
+  liked_on DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (like_id),
   FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
@@ -53,7 +53,7 @@ CREATE TABLE followers(
   follower_id INT NOT NULL AUTO_INCREMENT,
   follower_user INT NOT NULL,
   following_user INT NOT NULL,
-  followed_on DATETIME NOT NULL,
+  followed_on DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(follower_id),
   FOREIGN KEY(follower_user) REFERENCES users(user_id) ON DELETE CASCADE,
   FOREIGN KEY(following_user) REFERENCES users(user_id) ON DELETE CASCADE
@@ -63,7 +63,7 @@ CREATE TABLE reposts(
   repost_id INT NOT NULL AUTO_INCREMENT,
   post_id INT NOT NULL,
   user_id INT NOT NULL,
-  reposted_on DATETIME NOT NULL,
+  reposted_on DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (repost_id),
   FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE

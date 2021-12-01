@@ -31,15 +31,15 @@ public class User {
   private Date registeredOn;
 
 
-  @JsonIgnore
-  public Long getUserId() {
-    return userId;
-  }
+  // @JsonIgnore
+  // public Long getUserId() {
+  //   return userId;
+  // }
 
-  @JsonIgnore
-  public Date getRegisteredOn() {
-    return registeredOn;
-  }
+  // @JsonIgnore
+  // public Date getRegisteredOn() {
+  //   return registeredOn;
+  // }
 }
 
 

@@ -21,7 +21,6 @@ public class DefaultUserController implements UserController {
 
   @Override
   public User getUser(Long userId) {
-    
     return userService.getUserById(userId);
   }
 

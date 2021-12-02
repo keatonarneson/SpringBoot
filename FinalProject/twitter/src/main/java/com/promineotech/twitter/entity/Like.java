@@ -1,5 +1,7 @@
 package com.promineotech.twitter.entity;
 
+import java.sql.Date;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,7 +11,7 @@ public class Like {
   private Long likeId;
   private Post post;
   private User user;
-  private String likedOn;
+  private Date likedOn;
 }
 
 

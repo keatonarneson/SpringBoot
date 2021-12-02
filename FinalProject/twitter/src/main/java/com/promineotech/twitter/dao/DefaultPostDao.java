@@ -121,7 +121,7 @@ public class DefaultPostDao implements PostDao {
       return Post.builder().postId(rs.getLong("post_id")).content(rs.getString("content"))
           .postedBy(fetchUser(rs.getLong("posted_by")))
           .postedOn(rs.getDate("posted_on")).likeCount(rs.getInt("like_count"))
-          .parentPost(getPostById(rs.getLong("post_id"))).build();
+          .parentPost(null).build();
     }
     
   }

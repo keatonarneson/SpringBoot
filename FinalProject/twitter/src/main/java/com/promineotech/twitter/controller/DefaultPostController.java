@@ -20,6 +20,18 @@ public class DefaultPostController implements PostController {
   }
 
   @Override
+  public List<Post> getAllPostsAndRepostsForUser(Long userId) {
+
+    return postService.getAllPostsAndRepostsForUser(userId);
+  }
+
+  @Override
+  public List<Post> getAllPostsAndRepostsAndRepliesForUser(Long userId) {
+
+    return postService.getAllPostsAndRepostsAndRepliesForUser(userId);
+  }
+
+  @Override
   public Post getPost(Long postId) {
     return postService.getPostById(postId);
   }
@@ -33,5 +45,4 @@ public class DefaultPostController implements PostController {
   public void deletePost(Long postId) {
     postService.deletePost(postId);
   }
-  
 }

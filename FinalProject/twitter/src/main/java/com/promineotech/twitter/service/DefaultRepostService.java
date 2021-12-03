@@ -16,15 +16,15 @@ public class DefaultRepostService implements RepostService {
 
   @Transactional
   @Override
-  public Post addRepost(Long postId, User authUser) {
+  public Post addRepost(Long postId, Long authUserId) {
 
-    return repostDao.addRepost(postId, authUser);
+    return repostDao.addRepost(postId, authUserId);
   }
 
   @Transactional
   @Override
-  public void removeRepost(Long postId, User authUser) {
+  public void removeRepost(Long postId, Long authUserId) {
 
-    repostDao.removeRepost(postId, authUser);
+    repostDao.removeRepost(postId, authUserId);
   } 
 }

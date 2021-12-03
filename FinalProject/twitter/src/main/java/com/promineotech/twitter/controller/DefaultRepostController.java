@@ -14,15 +14,15 @@ public class DefaultRepostController implements RepostController {
   private RepostService repostService;
 
   @Override
-  public Post addRepost(User authUser, Long postId) {
+  public Post addRepost(Long authUserId, Long postId) {
 
-    return repostService.addRepost(postId, authUser);
+    return repostService.addRepost(postId, authUserId);
   }
 
   @Override
-  public void removeRepost(User authUser, Long postId) {
+  public void removeRepost(Long authUserId, Long postId) {
 
-    repostService.removeRepost(postId, authUser);
+    repostService.removeRepost(postId, authUserId);
   }
   
 }

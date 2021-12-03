@@ -18,16 +18,16 @@ public class DefaultFollowService implements FollowService {
 
   @Transactional
   @Override
-  public Follower followUser(Long userId, User authUser) {
+  public Follower followUser(Long userId, Long authUserId) {
 
-    return followDao.followUser(userId, authUser);
+    return followDao.followUser(userId, authUserId);
   }
 
   @Transactional
   @Override
-  public void unfollowUser(Long userId, User authUser) {
+  public void unfollowUser(Long userId, Long authUserId) {
 
-    followDao.unfollowUser(userId, authUser);
+    followDao.unfollowUser(userId, authUserId);
   }
 
   @Transactional(readOnly = true)

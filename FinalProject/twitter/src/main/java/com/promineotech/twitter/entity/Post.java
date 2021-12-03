@@ -16,3 +16,4 @@ public class Post {
   private int replyCount;
   private Post parentPost;
 }
+

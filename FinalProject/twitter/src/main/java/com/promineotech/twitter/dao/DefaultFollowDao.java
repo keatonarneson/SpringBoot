@@ -28,7 +28,7 @@ public class DefaultFollowDao implements FollowDao {
   private UserDao userDao;
 
   @Override
-  public Follower followUser(Long userId, User authUser) {
+  public Follower followUser(Long userId, Long authUserId) {
     
     String sql = "INSERT INTO followers (follower_user, following_user) VALUES (:follower_user, :following_user)";
 
@@ -36,7 +36,7 @@ public class DefaultFollowDao implements FollowDao {
 
     params.sql = sql;
     params.source.addValue("follower_user", userId);
-    params.source.addValue("following_user", authUser.getUserId());
+    params.source.addValue("following_user", authUserId);
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
     jdbcTemplate.update(params.sql, params.source, keyHolder);
@@ -55,7 +55,7 @@ public class DefaultFollowDao implements FollowDao {
     SqlParams paramsFollowing = new SqlParams();
 
     paramsFollowing.sql = sqlFollowing;
-    paramsFollowing.source.addValue("user_id", authUser.getUserId());
+    paramsFollowing.source.addValue("user_id", authUserId);
 
     jdbcTemplate.update(paramsFollowing.sql, paramsFollowing.source);
 
@@ -70,7 +70,7 @@ public class DefaultFollowDao implements FollowDao {
   }
 
   @Override
-  public void unfollowUser(Long userId, User authUser) {
+  public void unfollowUser(Long userId, Long authUserId) {
     
     String sql = "DELETE FROM followers WHERE follower_user = :follower_user AND following_user = :following_user";
 
@@ -78,7 +78,7 @@ public class DefaultFollowDao implements FollowDao {
 
     params.sql = sql;
     params.source.addValue("follower_user", userId);
-    params.source.addValue("following_user", authUser.getUserId());
+    params.source.addValue("following_user", authUserId);
 
     jdbcTemplate.update(params.sql, params.source);
 
@@ -96,7 +96,7 @@ public class DefaultFollowDao implements FollowDao {
     SqlParams paramsFollowing = new SqlParams();
 
     paramsFollowing.sql = sqlFollowing;
-    paramsFollowing.source.addValue("user_id", authUser.getUserId());
+    paramsFollowing.source.addValue("user_id", authUserId);
 
     jdbcTemplate.update(paramsFollowing.sql, paramsFollowing.source);
   }

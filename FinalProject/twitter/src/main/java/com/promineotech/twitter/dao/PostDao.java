@@ -1,6 +1,7 @@
 package com.promineotech.twitter.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.promineotech.twitter.entity.Post;
 import com.promineotech.twitter.entity.User;
@@ -8,13 +9,15 @@ import com.promineotech.twitter.entity.User;
 public interface PostDao {
   List<Post> getAllPostsForUser(User user);
 
+  List<Post> getAllPostsAndRepostsForUser(User user);
+
+  List<Post> getAllPostsAndRepostsAndRepliesForUser(User user);
+
   Post getPostById(Long postId);
 
   Post savePost(Post post);
 
   void deletePost(Long postId);
-
-  User fetchUser(Long userId);
 
   
 }

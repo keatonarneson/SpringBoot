@@ -7,6 +7,10 @@ import com.promineotech.twitter.entity.Post;
 public interface PostService {
   List<Post> getAllPostsForUser(Long userId);
 
+  List<Post> getAllPostsAndRepostsForUser(Long userId);
+
+  List<Post> getAllPostsAndRepostsAndRepliesForUser(Long userId);
+
   Post getPostById(Long postId);
 
   Post createPost(Post post);

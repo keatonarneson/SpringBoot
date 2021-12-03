@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import com.promineotech.twitter.entity.Post;
 import com.promineotech.twitter.entity.User;
@@ -25,10 +26,16 @@ public class DefaultPostDao implements PostDao {
   @Autowired
   private NamedParameterJdbcTemplate jdbcTemplate;
 
+  @Autowired
+  private UserDao userDao;
+
+  @Autowired
+  private PostDao postDao;
+
   @Override
   public List<Post> getAllPostsForUser(User user) {
 
-    String sql = "SELECT * FROM posts WHERE posted_by = :posted_by";
+    String sql = "SELECT * FROM posts WHERE posted_by = :posted_by AND parent_id IS NULL";
 
     Map<String, Object> params = new HashMap<>();
     params.put("posted_by", user.getUserId());
@@ -37,7 +44,25 @@ public class DefaultPostDao implements PostDao {
   }
 
   @Override
-  public Post getPostById(Long postId) {
+  public List<Post> getAllPostsAndRepostsForUser(User user) {
+    
+    String sql = "SELECT posts.*, reposts.* FROM posts INNER JOIN reposts ON  WHERE posted_by = :posted_by AND parent_id = null";
+
+    // String sql = "SELECT followers.*, users.* FROM followers INNER JOIN users ON following_user = users.user_id WHERE follower_user = :follower_user";
+
+    return null;
+  }
+
+  @Override
+  public List<Post> getAllPostsAndRepostsAndRepliesForUser(User user) {
+
+    String sql = "SELECT * FROM posts WHERE posted_by = :posted_by";
+
+    return null;
+  }
+
+  @Override
+  public Post getPostById(Long postId) { 
 
     String sql = "SELECT * FROM posts WHERE post_id = :post_id";
 
@@ -66,6 +91,18 @@ public class DefaultPostDao implements PostDao {
 
     Long postId = keyHolder.getKey().longValue();
 
+    if (post.getParentPost() != null) {
+
+      String sqlReply = "UPDATE posts SET reply_count = reply_count + 1 WHERE post_id = :post_id";
+
+      SqlParams paramsReply = new SqlParams();
+
+      paramsReply.sql = sqlReply;
+      paramsReply.source.addValue("post_id", post.getParentPost().getPostId());
+
+      jdbcTemplate.update(paramsReply.sql, paramsReply.source);
+    }
+
     return Post.builder()
         .postId(postId)
         .content(post.getContent())
@@ -78,7 +115,7 @@ public class DefaultPostDao implements PostDao {
 
   @Override
   public void deletePost(Long postId) {
-    
+
     String sql = "DELETE FROM posts WHERE post_id = :post_id";
 
     Map<String, Object> params = new HashMap<>();
@@ -87,45 +124,58 @@ public class DefaultPostDao implements PostDao {
     jdbcTemplate.update(sql, params);
   }
 
+// ---------------------------------------------------------------------------------------
+class PostResultSetExtractor implements ResultSetExtractor<Post> {
+
   @Override
-  public User fetchUser(Long userId) {
-    String sql = "SELECT * FROM users WHERE user_id = :user_id";
+  public Post extractData(ResultSet rs) throws SQLException, DataAccessException {
 
-    Map<String, Object> params = new HashMap<>();
-    params.put("user_id", userId);
-    return jdbcTemplate.query(sql, params, new UserResultSetExtractor());
-  }
-
-  // ---------------------------------------------------------------------------------------
-  class PostMapper implements RowMapper<Post> {
-
-    @Override
-    public Post mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-      return Post.builder().postId(rs.getLong("post_id")).content(rs.getString("content"))
-          .postedBy(fetchUser(rs.getLong("posted_by")))
-          .postedOn(rs.getDate("posted_on")).likeCount(rs.getInt("like_count"))
-          .parentPost(getPostById(rs.getLong("post_id"))).build();
+    if (!rs.next()) {
+      throw new NoSuchElementException();
     }
-  }
-  
-  class PostResultSetExtractor implements ResultSetExtractor<Post> {
 
-    @Override
-    public Post extractData(ResultSet rs) throws SQLException, DataAccessException {
-      
-      if (!rs.next()) {
-        throw new NoSuchElementException();
-      }
+    Long parentId;
 
-      return Post.builder().postId(rs.getLong("post_id")).content(rs.getString("content"))
-          .postedBy(fetchUser(rs.getLong("posted_by")))
-          .postedOn(rs.getDate("posted_on")).likeCount(rs.getInt("like_count"))
-          .parentPost(null).build();
+    Post parentPost = null;
+
+    if (rs.getLong("parent_id") > 0) {
+        parentId = rs.getLong("parent_id");
+        parentPost = postDao.getPostById(parentId);
     }
-    
-  }
 
+    return Post.builder().postId(rs.getLong("post_id")).content(rs.getString("content"))
+        .postedBy(userDao.getUserById(rs.getLong("posted_by")))
+        .postedOn(rs.getDate("posted_on")).likeCount(rs.getInt("like_count"))
+        .parentPost(parentPost).build();
+  }
 }
+
+
+class PostMapper implements RowMapper<Post> {
+
+  @Override
+  public Post mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+    Long parentId;
+
+    Post parentPost = null;
+
+    if (rs.getLong("parent_id") > 0) {
+      parentId = rs.getLong("parent_id");
+      parentPost = postDao.getPostById(parentId);
+    }
+
+    return Post.builder().postId(rs.getLong("post_id")).content(rs.getString("content"))
+      .postedBy(userDao.getUserById(rs.getLong("posted_by")))
+      .postedOn(rs.getDate("posted_on")).likeCount(rs.getInt("like_count"))
+      .replyCount(rs.getInt("reply_count"))
+      .parentPost(parentPost).build();
+    }
+  }
+}
+
+
+  
+
 
 

@@ -19,16 +19,16 @@ public class DefaultLikeService implements LikeService {
 
   @Transactional
   @Override
-  public Post likePost(Long postId, User likedUser) {
+  public Post likePost(Long postId, Long likedUserId) {
 
-    return likeDao.likePost(postId, likedUser);
+    return likeDao.likePost(postId, likedUserId);
   }
 
   @Transactional
   @Override
-  public Post unlikePost(Long postId, User likedUser) {
+  public Post unlikePost(Long postId, Long likedUserId) {
 
-    return likeDao.unlikePost(postId, likedUser);
+    return likeDao.unlikePost(postId, likedUserId);
   }
 
   @Transactional(readOnly = true)

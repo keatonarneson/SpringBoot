@@ -7,9 +7,9 @@ import com.promineotech.twitter.entity.User;
 
 public interface FollowDao {
   
-  Follower followUser(Long userId, User authUser);
+  Follower followUser(Long userId, Long authUserId);
 
-  void unfollowUser(Long userId, User authUser);
+  void unfollowUser(Long userId, Long authUserId);
 
   List<User> getFollowersForUser(Long userId);
 

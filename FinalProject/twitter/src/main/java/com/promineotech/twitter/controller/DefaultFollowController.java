@@ -16,15 +16,15 @@ public class DefaultFollowController implements FollowController {
   FollowService followService;
 
   @Override
-  public Follower followUser(User authUser, Long userId) {
+  public Follower followUser(Long authUserId, Long userId) {
 
-    return followService.followUser(userId, authUser);
+    return followService.followUser(userId, authUserId);
   }
 
   @Override
-  public void unfollowUser(User authUser, Long userId) {
+  public void unfollowUser(Long authUserId, Long userId) {
 
-    followService.unfollowUser(userId, authUser);
+    followService.unfollowUser(userId, authUserId);
   }
 
   @Override

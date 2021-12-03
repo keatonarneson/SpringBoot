@@ -24,6 +24,16 @@ public interface PostController {
   @ResponseStatus(code = HttpStatus.OK)
   List<Post> getAllPostsForUser(@RequestParam Long userId);
 
+  @Operation(summary = "Get all Posts and Reposts for User", description = "Returns list of Posts and Reposts for User")
+  @GetMapping("posts-reposts")
+  @ResponseStatus(code = HttpStatus.OK)
+  List<Post> getAllPostsAndRepostsForUser(@RequestParam Long userId);
+
+  @Operation(summary = "Get all Posts, Reposts, and Replies for User", description = "Returns list of Posts, Reposts, and Replies for User")
+  @GetMapping("posts-reposts-replies")
+  @ResponseStatus(code = HttpStatus.OK)
+  List<Post> getAllPostsAndRepostsAndRepliesForUser(@RequestParam Long userId);
+
   @Operation(summary = "Get Post", description = "Returns Post by Post ID")
   @GetMapping("posts/{postId}")
   @ResponseStatus(code = HttpStatus.OK)

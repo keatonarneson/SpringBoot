@@ -3,3 +3,8 @@ spring:
     password: twitter
     username: twitter
     url: jdbc:mysql://localhost:3306/twitter
+
+logging:
+  level:
+    root: warn
+    '[com.promineotech]': debug

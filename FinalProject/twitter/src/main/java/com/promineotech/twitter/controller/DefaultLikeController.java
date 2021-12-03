@@ -17,15 +17,15 @@ public class DefaultLikeController implements LikeController {
   LikeService likeService;
 
   @Override
-  public Post likePost(User user, Long postId) {
+  public Post likePost(Long userId, Long postId) {
 
-    return likeService.likePost(postId, user);
+    return likeService.likePost(postId, userId);
   }
 
   @Override
-  public Post unlikePost(User user, Long postId) {
+  public Post unlikePost(Long userId, Long postId) {
 
-    return likeService.unlikePost(postId, user);
+    return likeService.unlikePost(postId, userId);
   }
 
   @Override

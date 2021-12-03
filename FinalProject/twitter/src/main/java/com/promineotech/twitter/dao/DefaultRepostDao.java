@@ -1,7 +1,6 @@
 package com.promineotech.twitter.dao;
 
 import com.promineotech.twitter.entity.Post;
-import com.promineotech.twitter.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -17,7 +16,7 @@ public class DefaultRepostDao implements RepostDao {
   private PostDao postDao;
 
   @Override
-  public Post addRepost(Long postId, User authUser) {
+  public Post addRepost(Long postId, Long authUserId) {
     
     String sql = "INSERT INTO reposts (post_id, user_id) VALUES (:post_id, :user_id)";
 
@@ -25,7 +24,7 @@ public class DefaultRepostDao implements RepostDao {
 
     params.sql = sql;
     params.source.addValue("post_id", postId);
-    params.source.addValue("user_id", authUser.getUserId());
+    params.source.addValue("user_id", authUserId);
 
     jdbcTemplate.update(params.sql, params.source);
 
@@ -43,7 +42,7 @@ public class DefaultRepostDao implements RepostDao {
   }
 
   @Override
-  public void removeRepost(Long postId, User authUser) {
+  public void removeRepost(Long postId, Long authUserId) {
     
     String sql = "DELETE FROM reposts WHERE post_id = :post_id AND user_id = :user_id";
 
@@ -51,7 +50,7 @@ public class DefaultRepostDao implements RepostDao {
 
     params.sql = sql;
     params.source.addValue("post_id", postId);
-    params.source.addValue("user_id", authUser.getUserId());
+    params.source.addValue("user_id", authUserId);
 
     jdbcTemplate.update(params.sql, params.source);
   }

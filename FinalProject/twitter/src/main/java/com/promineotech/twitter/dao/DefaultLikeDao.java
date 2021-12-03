@@ -26,7 +26,7 @@ public class DefaultLikeDao implements LikeDao {
   private UserDao userDao;
 
   @Override
-  public Post likePost(Long postId, User likedUser) {
+  public Post likePost(Long postId, Long likedUserId) {
 
     String sql = "INSERT INTO likes (post_id, user_id) VALUES (:post_id, :user_id)";
 
@@ -34,7 +34,7 @@ public class DefaultLikeDao implements LikeDao {
 
     params.sql = sql;
     params.source.addValue("post_id", postId);
-    params.source.addValue("user_id", likedUser.getUserId());
+    params.source.addValue("user_id", likedUserId);
 
     jdbcTemplate.update(params.sql, params.source);
 
@@ -61,7 +61,7 @@ public class DefaultLikeDao implements LikeDao {
   }
 
   @Override
-  public Post unlikePost(Long postId, User likedUser) {
+  public Post unlikePost(Long postId, Long likedUserId) {
 
     String sql = "DELETE FROM likes WHERE post_id = :post_id AND user_id = :user_id";
 
@@ -69,7 +69,7 @@ public class DefaultLikeDao implements LikeDao {
 
     params.sql = sql;
     params.source.addValue("post_id", postId);
-    params.source.addValue("user_id", likedUser.getUserId());
+    params.source.addValue("user_id", likedUserId);
 
     jdbcTemplate.update(params.sql, params.source);
 

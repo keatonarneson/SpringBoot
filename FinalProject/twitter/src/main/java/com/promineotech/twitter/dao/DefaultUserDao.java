@@ -117,7 +117,7 @@ public class DefaultUserDao implements UserDao {
 
 }
 
-// --------------------helper methods below-----------------------------------------------------------------------------------------------------------
+// --------------------helper methods below-------------------------------------------------
 
 class UserMapper implements RowMapper<User> {
 

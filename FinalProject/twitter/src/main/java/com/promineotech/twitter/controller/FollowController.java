@@ -2,8 +2,7 @@ package com.promineotech.twitter.controller;
 
 import java.util.List;
 
-import com.promineotech.twitter.entity.Like;
-import com.promineotech.twitter.entity.Post;
+import com.promineotech.twitter.entity.Follower;
 import com.promineotech.twitter.entity.User;
 
 import org.springframework.http.HttpStatus;
@@ -16,17 +15,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @RequestMapping("/api/v1")
-public interface LikeController {
+public interface FollowController {
 
-  @PostMapping("posts/like/{postId}")
+  @PostMapping("users/follow/{userId}")
   @ResponseStatus(code = HttpStatus.OK)
-  Post likePost(@RequestBody User user, @PathVariable Long postId);
+  Follower followUser(@RequestBody User authUser, @PathVariable Long userId);
 
-  @DeleteMapping("posts/unlike/{postId}")
-  @ResponseStatus(code = HttpStatus.OK)
-  Post unlikePost(@RequestBody User user, @PathVariable Long postId);
+  @DeleteMapping("users/unfollow/{userId}")
+  @ResponseStatus(code = HttpStatus.NO_CONTENT)
+  void unfollowUser(@RequestBody User authUser, @PathVariable Long userId);
 
-  @GetMapping("posts/likes/{postId}")
+  @GetMapping("users/followers/{userId}")
   @ResponseStatus(code = HttpStatus.OK)
-  List<Like> getLikesForPost(@PathVariable Long postId);
+  List<User> getFollowersForUser(@PathVariable Long userId);
+
+  @GetMapping("users/following/{userId}")
+  @ResponseStatus(code = HttpStatus.OK)
+  List<User> getFollowingForUser(@PathVariable Long userId);
+  
 }

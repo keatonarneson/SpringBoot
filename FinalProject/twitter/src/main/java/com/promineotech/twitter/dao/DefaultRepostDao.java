@@ -77,6 +77,8 @@ public class DefaultRepostDao implements RepostDao {
     jdbcTemplate.update(params.sql, params.source);
   }
 
+  //----------------------------------------------------------------------------------------
+
   class RepostResultSetExtractor implements ResultSetExtractor<Repost> {
 
     @Override
@@ -115,8 +117,9 @@ public class DefaultRepostDao implements RepostDao {
     }
 
     if (repost == null && removeRepost == true) {
-      String msg = String.format("Repost for User with UserID=%d and Post with PostID=%d does not exist", authUserId, postId);
-      
+      String msg = String.format("Repost for User with UserID=%d and Post with PostID=%d does not exist", authUserId,
+          postId);
+
       throw new IllegalArgumentException(msg);
     }
   }

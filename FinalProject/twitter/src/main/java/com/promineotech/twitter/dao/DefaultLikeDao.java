@@ -130,6 +130,8 @@ public class DefaultLikeDao implements LikeDao {
 
   }
 
+  //----------------------------------------------------------------------------------------
+
   class LikeResultSetExtractor implements ResultSetExtractor<Like> {
     @Override
     public Like extractData(ResultSet rs) throws SQLException {

@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 
 import com.promineotech.twitter.entity.Follower;
 import com.promineotech.twitter.entity.User;
+import com.promineotech.twitter.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -27,8 +28,16 @@ public class DefaultFollowDao implements FollowDao {
   @Autowired
   private UserDao userDao;
 
+  @Autowired
+  private UserService userService;
+
   @Override
   public Follower followUser(Long userId, Long authUserId) {
+
+    userService.checkIfUserExists(userId);
+    userService.checkIfUserExists(authUserId);
+    checkIfUserAndAuthUserAreEqual(userId, authUserId);
+    checkIfFollowerExists(userId, authUserId, false);
     
     String sql = "INSERT INTO followers (follower_user, following_user) VALUES (:follower_user, :following_user)";
 
@@ -71,6 +80,8 @@ public class DefaultFollowDao implements FollowDao {
 
   @Override
   public void unfollowUser(Long userId, Long authUserId) {
+
+    checkIfFollowerExists(userId, authUserId, true);
     
     String sql = "DELETE FROM followers WHERE follower_user = :follower_user AND following_user = :following_user";
 
@@ -104,6 +115,8 @@ public class DefaultFollowDao implements FollowDao {
   @Override
   public List<User> getFollowersForUser(Long userId) {
 
+    userService.checkIfUserExists(userId);
+
     String sql = "SELECT followers.*, users.* FROM followers INNER JOIN users ON following_user = users.user_id WHERE follower_user = :follower_user";
 
     SqlParams params = new SqlParams();
@@ -117,6 +130,8 @@ public class DefaultFollowDao implements FollowDao {
 
   @Override
   public List<User> getFollowingForUser(Long userId) {
+
+    userService.checkIfUserExists(userId);
 
     String sql = "SELECT followers.*, users.* FROM followers INNER JOIN users ON follower_user = users.user_id WHERE following_user = :following_user";
 
@@ -136,7 +151,7 @@ public class DefaultFollowDao implements FollowDao {
     public Follower extractData(ResultSet rs) throws SQLException, DataAccessException {
 
       if (!rs.next()) {
-        throw new NoSuchElementException();
+        return null;
       }
 
       return Follower.builder()
@@ -147,4 +162,43 @@ public class DefaultFollowDao implements FollowDao {
           .build();
     }
   }
+
+  private void checkIfFollowerExists(Long userId, Long authUserId, boolean unfollow) {
+
+    String sql = "SELECT * FROM followers where follower_user = :follower_user AND following_user = :following_user";
+
+    SqlParams params = new SqlParams();
+
+    params.sql = sql;
+    params.source.addValue("follower_user", userId);
+    params.source.addValue("following_user", authUserId);
+
+    Follower follower = jdbcTemplate.query(params.sql, params.source, new FollowingResultSetExtractor());
+
+    if (follower != null && unfollow == false) {
+      String msg = String.format("User with UserID=%d already follows User with UserID=%d", authUserId, userId);
+
+      throw new IllegalArgumentException(msg);
+    }
+
+    if (follower == null && unfollow == true) {
+      String msg = String.format("User with UserID=%d does not follow User with UserID=%d", authUserId, userId);
+
+      throw new IllegalArgumentException(msg);
+    }
+  }
+  
+  private void checkIfUserAndAuthUserAreEqual(Long userId, Long authUserId) {
+    if (userId == authUserId) {
+      String msg = String.format("User with UserID=%d cannot follow User with UserID=%d as they are the same User", authUserId, userId);
+
+      throw new IllegalArgumentException(msg);
+    }
+  }
 }
+
+
+
+
+
+

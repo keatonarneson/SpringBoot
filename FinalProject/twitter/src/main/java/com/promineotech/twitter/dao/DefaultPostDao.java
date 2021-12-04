@@ -49,19 +49,25 @@ public class DefaultPostDao implements PostDao {
   @Override
   public List<Post> getAllPostsAndRepostsForUser(User user) {
     
-    String sql = "SELECT posts.*, reposts.* FROM posts INNER JOIN reposts ON  WHERE posted_by = :posted_by AND parent_id IS NULL";
+    String sql = "SELECT * FROM posts LEFT JOIN reposts ON posts.post_id = reposts.post_id WHERE posted_by = :posted_by OR user_id = :user_id AND parent_id IS NULL GROUP BY posts.post_id";
 
-    // String sql = "SELECT followers.*, users.* FROM followers INNER JOIN users ON following_user = users.user_id WHERE follower_user = :follower_user";
+    Map<String, Object> params = new HashMap<>();
+    params.put("user_id", user.getUserId());
+    params.put("posted_by", user.getUserId());
 
-    return null;
+    return jdbcTemplate.query(sql, params, new PostMapper());
   }
 
   @Override
   public List<Post> getAllPostsAndRepostsAndRepliesForUser(User user) {
 
-    String sql = "SELECT * FROM posts WHERE posted_by = :posted_by";
+    String sql = "SELECT * FROM posts LEFT JOIN reposts ON posts.post_id = reposts.post_id WHERE posted_by = :posted_by OR user_id = :user_id GROUP BY posts.post_id";
 
-    return null;
+    Map<String, Object> params = new HashMap<>();
+    params.put("user_id", user.getUserId());
+    params.put("posted_by", user.getUserId());
+
+    return jdbcTemplate.query(sql, params, new PostMapper());
   }
 
   @Override

@@ -72,7 +72,7 @@ public class DefaultUserDao implements UserDao {
         .password(user.getPassword()).name(user.getName()).bio(user.getBio()).location(user.getLocation())
         .website(user.getWebsite()).birthdate(user.getBirthdate()).avatarURL(user.getAvatarURL())
         .coverPhotoURL(user.getCoverPhotoURL()).followersCount(user.getFollowersCount())
-        .followingCount(user.getFollowingCount()).build();
+        .followingCount(user.getFollowingCount()).registeredOn(user.getRegisteredOn()).build();
   }
 
   @Override

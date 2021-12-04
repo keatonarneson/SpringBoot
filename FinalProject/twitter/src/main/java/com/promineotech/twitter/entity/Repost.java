@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class Repost {
-  private Long respostId;
+  private Long repostId;
   private Post post;
   private User user;
   private Date repostedOn;

@@ -16,4 +16,6 @@ public interface PostService {
   Post createPost(Post post);
 
   void deletePost(Long postId);
+
+  void checkIfPostExists(Long postId);
 }

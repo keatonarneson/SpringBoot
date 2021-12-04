@@ -2,7 +2,6 @@ package com.promineotech.twitter.service;
 
 import com.promineotech.twitter.dao.RepostDao;
 import com.promineotech.twitter.entity.Post;
-import com.promineotech.twitter.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

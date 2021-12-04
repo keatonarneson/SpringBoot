@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.promineotech.twitter.entity.Like;
 import com.promineotech.twitter.entity.Post;
-import com.promineotech.twitter.entity.User;
 import com.promineotech.twitter.service.LikeService;
 
 import org.springframework.beans.factory.annotation.Autowired;

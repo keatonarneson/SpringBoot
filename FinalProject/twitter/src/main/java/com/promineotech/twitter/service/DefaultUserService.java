@@ -57,8 +57,8 @@ public class DefaultUserService implements UserService {
   }
 
 
-  // ----helper methods below---------------------------------------------------------------
-  void checkIfUserExists(Long userId) {
+  // ---------------------------------------------------------------------------------------
+  public void checkIfUserExists(Long userId) {
     User fetchedUser = userDao.getUserById(userId);
 
     if (fetchedUser == null) {
@@ -67,8 +67,6 @@ public class DefaultUserService implements UserService {
       throw new NoSuchElementException(msg);
     }
   }
-
-
 }
 
 

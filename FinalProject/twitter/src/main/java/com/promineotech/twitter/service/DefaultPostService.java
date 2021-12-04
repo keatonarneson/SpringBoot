@@ -51,6 +51,8 @@ public class DefaultPostService implements PostService {
   @Transactional(readOnly = true)
   @Override
   public Post getPostById(Long postId) {
+
+    checkIfPostExists(postId);
     
     return postDao.getPostById(postId);
   }
@@ -66,6 +68,19 @@ public class DefaultPostService implements PostService {
   @Override
   public void deletePost(Long postId) {
 
+    checkIfPostExists(postId);
+
     postDao.deletePost(postId);
+  }
+
+// ---------------------------------------------------------------------------------------
+  public void checkIfPostExists(Long postId) {
+    Post fetchedPost = postDao.getPostById(postId);
+
+    if (fetchedPost == null) {
+      String msg = String.format("No Post with Post ID = %d", postId);
+
+      throw new NoSuchElementException(msg);
+    }
   }
 }

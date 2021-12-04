@@ -1,7 +1,6 @@
 package com.promineotech.twitter.dao;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.promineotech.twitter.entity.Post;
 import com.promineotech.twitter.entity.User;

@@ -5,7 +5,6 @@ import java.util.List;
 import com.promineotech.twitter.dao.LikeDao;
 import com.promineotech.twitter.entity.Like;
 import com.promineotech.twitter.entity.Post;
-import com.promineotech.twitter.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,9 @@ public class DefaultLikeService implements LikeService {
 
   @Autowired
   private LikeDao likeDao;
+
+  @Autowired
+  private PostService postService;
 
   @Transactional
   @Override
@@ -35,7 +37,8 @@ public class DefaultLikeService implements LikeService {
   @Override
   public List<Like> getLikesForPost(Long postId) {
 
+    postService.checkIfPostExists(postId);
+
     return likeDao.getLikesForPost(postId);
   }
-  
 }

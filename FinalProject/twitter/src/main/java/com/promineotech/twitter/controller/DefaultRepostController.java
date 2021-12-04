@@ -1,7 +1,6 @@
 package com.promineotech.twitter.controller;
 
 import com.promineotech.twitter.entity.Post;
-import com.promineotech.twitter.entity.User;
 import com.promineotech.twitter.service.RepostService;
 
 import org.springframework.beans.factory.annotation.Autowired;

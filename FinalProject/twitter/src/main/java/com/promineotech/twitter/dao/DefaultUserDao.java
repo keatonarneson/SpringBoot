@@ -45,6 +45,9 @@ public class DefaultUserDao implements UserDao {
 
   @Override
   public User saveUser(User user) {
+
+    System.out.println(user);
+
     String sql = "INSERT INTO users (username, email, password, name, bio, location, website, birthdate, avatar_url, cover_photo_url, followers_count, following_count) VALUES (:username, :email, :password, :name, :bio, :location, :website, :birthdate, :avatar_url, :cover_photo_url, :followers_count, :following_count)";
 
     SqlParams params = new SqlParams();

@@ -18,4 +18,6 @@ public interface PostService {
   void deletePost(Long postId);
 
   void checkIfPostExists(Long postId);
+
+  Post getParentPostById(Long postId);
 }

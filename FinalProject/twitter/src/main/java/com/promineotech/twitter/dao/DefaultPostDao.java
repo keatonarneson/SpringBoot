@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 
 import com.promineotech.twitter.entity.Post;
 import com.promineotech.twitter.entity.User;
+import com.promineotech.twitter.service.PostService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -31,6 +32,9 @@ public class DefaultPostDao implements PostDao {
   @Autowired
   private PostDao postDao;
 
+  @Autowired
+  private PostService postService;
+
   @Override
   public List<Post> getAllPostsForUser(User user) {
 
@@ -45,7 +49,7 @@ public class DefaultPostDao implements PostDao {
   @Override
   public List<Post> getAllPostsAndRepostsForUser(User user) {
     
-    String sql = "SELECT posts.*, reposts.* FROM posts INNER JOIN reposts ON  WHERE posted_by = :posted_by AND parent_id = null";
+    String sql = "SELECT posts.*, reposts.* FROM posts INNER JOIN reposts ON  WHERE posted_by = :posted_by AND parent_id IS NULL";
 
     // String sql = "SELECT followers.*, users.* FROM followers INNER JOIN users ON following_user = users.user_id WHERE follower_user = :follower_user";
 
@@ -61,7 +65,7 @@ public class DefaultPostDao implements PostDao {
   }
 
   @Override
-  public Post getPostById(Long postId) { 
+  public Post getPostById(Long postId) {
 
     String sql = "SELECT * FROM posts WHERE post_id = :post_id";
 
@@ -72,40 +76,43 @@ public class DefaultPostDao implements PostDao {
   }
 
   @Override
-  public Post savePost(Post post) {
-    
-    String sql = "INSERT INTO posts (content, posted_by, like_count, reply_count, parent_post) VALUES (:content, :posted_by, :like_count, :reply_count, :parent_post)";
+  public Post createPost(Post post) {
+
+    String sql = "INSERT INTO posts (content, posted_by, like_count, reply_count, parent_id) VALUES (:content, :posted_by, :like_count, :reply_count, :parent_id)";
 
     SqlParams params = new SqlParams();
 
     params.sql = sql;
     params.source.addValue("content", post.getContent());
-    params.source.addValue("posted_by", post.getPostedBy());
+    params.source.addValue("posted_by", post.getPostedBy().getUserId());
     params.source.addValue("like_count", post.getLikeCount());
     params.source.addValue("reply_count", post.getReplyCount());
-    params.source.addValue("parent_post", post.getParentPost());
+    
+    if (post.getParentPost() == null) {
+      params.source.addValue("parent_id", null);
+    } else {
+      params.source.addValue("parent_id", post.getParentPost().getPostId());
+
+      String sqlCount = "UPDATE posts SET reply_count = reply_count + 1 WHERE post_id = :post_id";
+
+      SqlParams paramsCount = new SqlParams();
+
+      paramsCount.sql = sqlCount;
+      paramsCount.source.addValue("post_id", post.getParentPost().getPostId());
+
+      jdbcTemplate.update(paramsCount.sql, paramsCount.source);
+    }
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
     jdbcTemplate.update(params.sql, params.source, keyHolder);
 
     Long postId = keyHolder.getKey().longValue();
 
-    if (post.getParentPost() != null) {
-
-      String sqlReply = "UPDATE posts SET reply_count = reply_count + 1 WHERE post_id = :post_id";
-
-      SqlParams paramsReply = new SqlParams();
-
-      paramsReply.sql = sqlReply;
-      paramsReply.source.addValue("post_id", post.getParentPost().getPostId());
-
-      jdbcTemplate.update(paramsReply.sql, paramsReply.source);
-    }
-
     return Post.builder()
         .postId(postId)
         .content(post.getContent())
         .postedBy(post.getPostedBy())
+        .postedOn(post.getPostedOn())
         .likeCount(post.getLikeCount())
         .replyCount(post.getReplyCount())
         .parentPost(post.getParentPost())
@@ -114,6 +121,18 @@ public class DefaultPostDao implements PostDao {
 
   @Override
   public void deletePost(Long postId) {
+
+      if (postService.getParentPostById(postId) != null) {
+
+      String sqlCount = "UPDATE posts SET reply_count = reply_count - 1 WHERE post_id = :post_id";
+
+      SqlParams paramsCount = new SqlParams();
+
+      paramsCount.sql = sqlCount;
+      paramsCount.source.addValue("post_id", postService.getPostById(postId).getParentPost().getPostId());
+
+      jdbcTemplate.update(paramsCount.sql, paramsCount.source);
+    }
 
     String sql = "DELETE FROM posts WHERE post_id = :post_id";
 
@@ -144,8 +163,7 @@ class PostResultSetExtractor implements ResultSetExtractor<Post> {
 
     return Post.builder().postId(rs.getLong("post_id")).content(rs.getString("content"))
         .postedBy(userDao.getUserById(rs.getLong("posted_by")))
-        .postedOn(rs.getDate("posted_on")).likeCount(rs.getInt("like_count"))
-        .parentPost(parentPost).build();
+        .postedOn(rs.getDate("posted_on")).likeCount(rs.getInt("like_count")).replyCount(rs.getInt("reply_count")).parentPost(parentPost).build();
   }
 }
 
@@ -167,8 +185,7 @@ class PostMapper implements RowMapper<Post> {
     return Post.builder().postId(rs.getLong("post_id")).content(rs.getString("content"))
       .postedBy(userDao.getUserById(rs.getLong("posted_by")))
       .postedOn(rs.getDate("posted_on")).likeCount(rs.getInt("like_count"))
-      .replyCount(rs.getInt("reply_count"))
-      .parentPost(parentPost).build();
+      .replyCount(rs.getInt("reply_count")).parentPost(parentPost).build();
     }
   }
 }

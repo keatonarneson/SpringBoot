@@ -38,6 +38,7 @@ public class DefaultPostController implements PostController {
 
   @Override
   public Post createPost(Post post) {
+
     return postService.createPost(post);
   }
 

@@ -14,7 +14,7 @@ public interface PostDao {
 
   Post getPostById(Long postId);
 
-  Post savePost(Post post);
+  Post createPost(Post post);
 
   void deletePost(Long postId);
 

@@ -61,7 +61,7 @@ public class DefaultPostService implements PostService {
   @Override
   public Post createPost(Post post) {
 
-    return postDao.savePost(post);
+    return postDao.createPost(post);
   }
 
   @Transactional
@@ -82,5 +82,11 @@ public class DefaultPostService implements PostService {
 
       throw new NoSuchElementException(msg);
     }
+  }
+
+  @Override
+  public Post getParentPostById(Long postId) {
+    
+    return postDao.getPostById(postId).getParentPost();
   }
 }

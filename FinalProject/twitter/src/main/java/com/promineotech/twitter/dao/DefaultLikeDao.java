@@ -3,7 +3,6 @@ package com.promineotech.twitter.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import com.promineotech.twitter.entity.Like;
 import com.promineotech.twitter.entity.Post;
@@ -86,8 +85,6 @@ public class DefaultLikeDao implements LikeDao {
     paramsCount.source.addValue("post_id", postId);
 
     jdbcTemplate.update(paramsCount.sql, paramsCount.source);
-
-    System.out.println(postId);
 
     Post post = postDao.getPostById(postId);
 
